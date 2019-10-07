@@ -64,39 +64,20 @@ int main(char argv[][], char **argv){
 		int offset;
 		if (argv[1][0] == '-') { // optional argument
 			offset = 2;
-			string displayLinesString = "";
-			for(int i = 1; i < argv.length(); i++){
+			if (isdigit(argv[1][1])){
+				string displayLinesString = "";
+				for(int i = 1; i < argv.length(); i++){
 					displayLinesString.append(argv[1][i]);
-			//displayLines = argv[1];
-
+				}	
+				displayLines = stoi(displayLinesString); // convert display lines value to integer
 			}
-			displayLines = stoi(displayLinesString); // convert display lines value to integer
-
+			
 		} else { // no optional argument
 			offset = 1;
 		}
 		commandv= &argv[offset];  // the value of an array is the address of its first element
 		filename = pathname;
 		filename.append("." + commandv);
-/*
-		if (myargv[0][0] == '/' || myargv[0][0] == '.') {
-		    // A full pathname was specified
-		    strcpy(pathname,myargv[0]);
-		    missing = access(pathname, X_OK);
-		    //  access returns 0 if the file is found
-		} else {
-		   for (i=0; i <  pathc; i++) {
-		       sprintf(pathname, "%s/%s", pathv[i],myargv[0]);
-		       if (!(missing=access(firstarg, X_OK)))
-		           // access returns 0 if the file is found!
-		           break;
-		       } // for
-		} // if-else
-		if (missing) {
-		     printf("%s: cannot be executed\n", myargv[0]);
-		     _exit(1);
-		} // if
-*/
 
 
 		//strcpy(buffer, getenv("PATH")); // this copies the string to the buffer char array, will test to see if I don't need it using string
