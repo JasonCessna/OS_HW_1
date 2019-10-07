@@ -2,7 +2,8 @@
 #include <string>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <fstream>
+#include <fstream> 
+#include <unistd.h>
 using namespace std;
 
 #define DEVTTY "/dev/tty"
@@ -156,3 +157,68 @@ Main program
     }
 	return 0;
 }
+
+/*
+
+int kidpid;
+if ((kidpid = fork())== 0)
+{
+// child process
+...
+_exit(0); // normal exit
+} // if
+// parent waits for child
+while (wait(0) != kidpid);
+
+char argv[][];
+char **argv;
+
+int pid
+if ((pid
+= fork()) == 0)
+{
+// child process
+...
+execvp(filename, argv);
+_exit(1); // exec failed
+} // if
+while (pid != wait(0));
+// parent waits
+
+
+int pd[2];
+//pd[0] to read from the pipe
+//pd[1] to write to the pipe
+
+
+
+char** commandv;
+int offset;
+if (argv[1][0] == '-') {<!-- --> // optional argument
+	offset = 2;
+} else {<!-- --> // no optional argument
+	offset = 1;
+}
+commandv= &argv[offset];  // the value of an array is the address of its first element
+
+
+
+
+if (myargv[0][0] == '/' || myargv[0][0] == '.') {
+    // A full pathname was specified
+    strcpy(pathname,myargv[0]);
+    missing = access(pathname, X_OK);
+    //  access returns 0 if the file is found
+} else {
+   for (i=0; i <  pathc; i++) {
+       sprintf(pathname, "%s/%s", pathv[i],myargv[0]);
+       if (!(missing=access(firstarg, X_OK)))
+           // access returns 0 if the file is found!
+           break;
+       } // for
+} // if-else
+if (missing) {
+     printf("%s: cannot be executed\n", myargv[0]);
+     _exit(1);
+} // if
+*/
