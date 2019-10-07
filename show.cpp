@@ -77,7 +77,7 @@ int main(char argv[][], char **argv){
 		}
 		commandv= &argv[offset];  // the value of an array is the address of its first element
 		filename = pathname;
-		filename.append("." + commandv);
+		filename.append(commandv);
 
 
 		//strcpy(buffer, getenv("PATH")); // this copies the string to the buffer char array, will test to see if I don't need it using string
