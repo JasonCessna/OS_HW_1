@@ -121,7 +121,7 @@ Main program
 					if(response == 'q' || response == 'Q'){
 						break;
 					}
-					else if (r response != "C" || response != "c"){
+					else if (response != "C" || response != "c"){
 						ofs << "Unrecognized command." << endl;
 				}
 				
