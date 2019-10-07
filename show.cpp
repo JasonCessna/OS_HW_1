@@ -118,12 +118,16 @@ Main program
 			show ls –alg > junkfile.txt
 	Displays screenful by screenful the output of the child process
 */
-
+		while (pid != wait(0));
 		close(0); 
 		dup(pd[0]); 
 		ofstream ofs(DEVTTY);
 		int counter = 1;
 		string response = "";
+
+	    while (read(pd[0], buffer, sizeof(buffer)) != 0)// ???
+    	{
+    	}
 		while(getline(cin, line)){
 			if (counter % displayLines != 0){
 
@@ -147,9 +151,7 @@ Main program
 		close(pd[1]);
 
 		//try using ofs << whatever << endl; instead of cout << whatever << endl;
-	    // while (read(pipefd[0], buffer, sizeof(buffer)) != 0)
-    	// {
-    	// }
+	 
 		//execv(filename, argv);
 		_exit(1); 
 
@@ -157,68 +159,3 @@ Main program
     }
 	return 0;
 }
-
-/*
-
-int kidpid;
-if ((kidpid = fork())== 0)
-{
-// child process
-...
-_exit(0); // normal exit
-} // if
-// parent waits for child
-while (wait(0) != kidpid);
-
-char argv[][];
-char **argv;
-
-int pid
-if ((pid
-= fork()) == 0)
-{
-// child process
-...
-execvp(filename, argv);
-_exit(1); // exec failed
-} // if
-while (pid != wait(0));
-// parent waits
-
-
-int pd[2];
-//pd[0] to read from the pipe
-//pd[1] to write to the pipe
-
-
-
-char** commandv;
-int offset;
-if (argv[1][0] == '-') {<!-- --> // optional argument
-	offset = 2;
-} else {<!-- --> // no optional argument
-	offset = 1;
-}
-commandv= &argv[offset];  // the value of an array is the address of its first element
-
-
-
-
-if (myargv[0][0] == '/' || myargv[0][0] == '.') {
-    // A full pathname was specified
-    strcpy(pathname,myargv[0]);
-    missing = access(pathname, X_OK);
-    //  access returns 0 if the file is found
-} else {
-   for (i=0; i <  pathc; i++) {
-       sprintf(pathname, "%s/%s", pathv[i],myargv[0]);
-       if (!(missing=access(firstarg, X_OK)))
-           // access returns 0 if the file is found!
-           break;
-       } // for
-} // if-else
-if (missing) {
-     printf("%s: cannot be executed\n", myargv[0]);
-     _exit(1);
-} // if
-*/
