@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 			*/
-		char* pathname[1024]; 
+		char* pathname; 
 		for (int i = 0; i < current_path + 1; i++) {
 			if (!access(path_arr[i], X_OK)) {
 				pathname[0] = path_arr[i];
@@ -174,7 +174,9 @@ int main(int argc, char* argv[]) {
 	
 		_exit(0);
 		
-	}/*
+	}
+	wait(0);
+	/*
 	while (pid != wait(0));
 	
 	close(0);
@@ -212,3 +214,4 @@ int main(int argc, char* argv[]) {
 	*/
 
 	return 0;
+}
