@@ -41,15 +41,27 @@ int main(int argc, char* argv[]) {
 		dup(pd[0]);
 		close(0);
 		close(pd[1]);
-		char *path_arr;
-		char* path;
+		char* path_arr[];
+		char path;
 		strcpy(path,getenv("PATH"));
 		int current_path = 0;
 		int placeHolder = 0;
 		ofs << path << endl;
 		//path_arr = strtok(path, ":");
 		
-		
+		char temp_string;
+
+		for(int i = 0; i< sizeof(path); i++){
+			if(path[i] == ':'){
+				current_path++;
+			}
+			else{
+				path_arr[current_path][sizeof(path_arr[current_path])] = path[i];
+			}
+
+		}
+
+		/*
 			for (int i = 0; i < sizeof(path); i++) {
 				ofs << i << endl;
 				if (path[i] != ':') {
@@ -66,8 +78,7 @@ int main(int argc, char* argv[]) {
 					current_path++;
 				}
 			}
-			
-		char* filename[1024];
+			*/
 		char* pathname[1024]; 
 		for (int i = 0; i < current_path + 1; i++) {
 			if (!access(path_arr[i], X_OK)) {
@@ -173,7 +184,6 @@ int main(int argc, char* argv[]) {
 	string response = "";
 	string line = "";
 	ifstream ifs(DEVTTY);
-
 	ofs << "test" << endl;
 	while (getline(ifs, line)) {
 		if (line == "\0") {
@@ -181,10 +191,8 @@ int main(int argc, char* argv[]) {
 		}
 		ofs << counter % displayLines << endl;
 		if (counter % displayLines != 0) {
-
 			ofs << line << endl;
 		}
-
 		else {
 			while (response != "Q" || response != "q" || response != "C" || response != "c") {
 				ofs << "Enter c+RETURN to continue, q+RETURN to quit:" << endl;
@@ -195,20 +203,12 @@ int main(int argc, char* argv[]) {
 				else if (response != "C" || response != "c") {
 					ofs << "Unrecognized command." << endl;
 				}
-
 			}
 		}
 		counter++;
 	}
-
-
-
-
 	close(pd[1]);
-
-
 	_exit(1);
 	*/
 
 	return 0;
-}
