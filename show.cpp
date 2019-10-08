@@ -1,142 +1,214 @@
 #include <iostream>
 #include <string>
+#include <vector>
+#include <sstream>
+#include <stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fstream> 
-#include <unistd.h>
+#include <cstdio>
 using namespace std;
 
-#define DEVTTY "/dev/tty"
 
-int main(char argv[][], char **argv){
-
-	//CONST int defaultLines 
+int main(int argc, char* argv[]) {
+	
+	string DEVTTY = "/dev/tty";
+	ofstream ofs(DEVTTY);
+	ifstream ifs(DEVTTY);
 	int displayLines = 20;
+	char** commandv;
 	int pd[2];
-  	int pid;
+	int pid;
 	pipe(pd);
 	char buffer[1024];
+	pid == fork();
+	if (pid  == 0) {
 
-	
-	
-	if ((pid = fork()) == 0){
-
-		char filename[1024];
+		
 		/*
 			Executes the specified command (“ls –alg”)
-	 		Three-step process:
+			Three-step process:
 				1 Set up the argument vector
-				2 Find program to be executed 
+				2 Find program to be executed
 					- Never be a built-in program
 				3 Perform the execv()
 		*/
 
- 		close(1); 
- 		dup(pd[1]); 
-		vector <string> path_arr;
-		string path = getenv("PATH"); //do I manually get the path or does this return a path?
-		int current_path = 0
-		for(int i = 0; i < path.length(); i++){
-			if(path[i] != ":"){
-				if(path_arr.length() == (current_path + 1)){
-					path_arr[current_path].append(path[i]);
+		dup(pd[0]);
+		close(0);
+		close(pd[1]);
+		char *path_arr;
+		char* path;
+		strcpy(path,getenv("PATH"));
+		int current_path = 0;
+		int placeHolder = 0;
+		ofs << path << endl;
+		//path_arr = strtok(path, ":");
+		
+		
+			for (int i = 0; i < sizeof(path); i++) {
+				ofs << i << endl;
+				if (path[i] != ':') {
+					if (sizeof(path_arr[i]) == (current_path + 1)) {
+						path_arr[current_path][0] = (path[0][i].c_str());
+						placeHolder = i;
+
+					}
+					else {
+						path_arr[current_path][i - placeHolder] = path[i];
+					}
 				}
-				else{
-					path_arr[current_path] = path[i];
+				else {
+					current_path++;
 				}
 			}
-			else{
-				current_path++;
-			}
-		}
-		char filename[1024];
-		char pathname[1024];
-		for(int i = 0; i < current_path + 1; i++){
-			sprintf(path_arr[i], "%s/%s",directory[i], argv[0]);
-			if(!access(pathname, X_OK)){
-				strcopy(pathname,path_arr[i]);
+			
+		char* filename[1024];
+		char* pathname[1024]; 
+		for (int i = 0; i < current_path + 1; i++) {
+			if (!access(path_arr[i], X_OK)) {
+				pathname[0] = path_arr[i];
+				/*strcpy(pathname[0], path_arr[i]);*/
 				break;
 			}
 
 		}
 
-		char** commandv;
 		int offset;
-		if (argv[1][0] == '-') { // optional argument
+		if (argv[1][0] == '-') { 
 			offset = 2;
-			if (isdigit(argv[1][1])){
-				string displayLinesString = "";
-				for(int i = 1; i < argv.length(); i++){
-					displayLinesString.append(argv[1][i]);
-				}	
-				displayLines = stoi(displayLinesString); // convert display lines value to integer
+			string displayLinesString = "";
+			if (isdigit(argv[1][1])) {
+				for (int i = 1; i < sizeof(argv[1]); i++) {
+
+					displayLines = stoi(displayLinesString); 
+				}
 			}
-			
-		} else { // no optional argument
+
+		}
+		else { 
 			offset = 1;
 		}
-		commandv= &argv[offset];  // the value of an array is the address of its first element
-		filename = pathname;
-		filename.append(commandv);
+		commandv = &argv[offset];  
+		char tempName[1024];
+		for (int j = 0; j < sizeof(pathname[0]) + 1; j++) {
+			if (j <= sizeof(pathname[0])) {
+				tempName[j] = pathname[0][j];
+			}
+			else {
+				for (int k = 0; k < sizeof(commandv[0]); k++) {
+					int L = j + k;
+					tempName[L] = commandv[0][k];
+				}
+			}
+		}
+		bool failure = execv(pathname[0], commandv);
+		if (failure) {
+			ofs << "Error" << endl;
+		}
 
+		/*execv(pathname[0], commandv);*/
 
-		//strcpy(buffer, getenv("PATH")); // this copies the string to the buffer char array, will test to see if I don't need it using string
-		execv(filename, argv);
+		_exit(0);
 
-		close(pd[1]);
-		_exit(1); 
-	// child process
+	}
+	else {
+		/*
+		Main program
+		(continues after the fork):
+			Redirects its stdin to pd[0]
+			Redirects its stdout to /dev/tty
+				- To defeat previous redirections:
+					show ls –alg > junkfile.txt
+			Displays screenful by screenful the output of the child process
+		*/
 
-}
-else{
-/*
-
-Main program
-(continues after the fork):
-	Redirects its stdin to pd[0]
-	Redirects its stdout to /dev/tty
-		- To defeat previous redirections:
-			show ls –alg > junkfile.txt
-	Displays screenful by screenful the output of the child process
-*/
+		
 		while (pid != wait(0));
-		close(0); 
-		dup(pd[0]); 
-		ofstream ofs(DEVTTY);
+		dup(pd[1]);
+		close(1);
+		close(pd[0]);
 		int counter = 1;
 		string response = "";
-
-	    while (read(pd[0], buffer, sizeof(buffer)) != 0)// ???
-    	{
-    	}
-		while(getline(cin, line)){
-			if (counter % displayLines != 0){
+		string line = "";
+		string test = "";
+		while (getline(ifs, line)) {
+			if (counter % displayLines != 0) {
 
 				ofs << line << endl;
 			}
-			else{
-				while(response != 'Q' || response != "q" || response != "C" || response != "c"){
+			else {
+				while (response != "Q" || response != "q" || response != "C" || response != "c") {
 					ofs << "Enter c+RETURN to continue, q+RETURN to quit:" << endl;
-						cin >> response >> endl;
-					if(response == 'q' || response == 'Q'){
+					ifs >> response;
+					if (response == "q" || response == "Q") {
 						break;
 					}
-					else if (response != "C" || response != "c"){
+					else if (response != "C" && response != "c") {
 						ofs << "Unrecognized command." << endl;
+					}
+
 				}
-				
 			}
 			counter++;
 		}
 
-		close(pd[1]);
-
-		//try using ofs << whatever << endl; instead of cout << whatever << endl;
-	 
-		//execv(filename, argv);
-		_exit(1); 
+			
 
 
-    }
+	
+		_exit(0);
+		
+	}/*
+	while (pid != wait(0));
+	
+	close(0);
+	dup(pd[0]);
+	ofstream ofs(DEVTTY);
+	int counter = 1;
+	string response = "";
+	string line = "";
+	ifstream ifs(DEVTTY);
+
+	ofs << "test" << endl;
+	while (getline(ifs, line)) {
+		if (line == "\0") {
+			break; 
+		}
+		ofs << counter % displayLines << endl;
+		if (counter % displayLines != 0) {
+
+			ofs << line << endl;
+		}
+
+		else {
+			while (response != "Q" || response != "q" || response != "C" || response != "c") {
+				ofs << "Enter c+RETURN to continue, q+RETURN to quit:" << endl;
+				cin >> response;
+				if (response == "q" || response == "Q") {
+					break;
+				}
+				else if (response != "C" || response != "c") {
+					ofs << "Unrecognized command." << endl;
+				}
+
+			}
+		}
+		counter++;
+	}
+
+
+
+
+	close(pd[1]);
+
+
+	_exit(1);
+	*/
+
 	return 0;
 }
