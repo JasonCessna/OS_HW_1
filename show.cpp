@@ -24,17 +24,18 @@ int main(int argc, char* argv[]) {
 	pipe(pd);
 	char buffer[1024];
 
-	int file_desc = open(DEVTTY, O_RDWR | O_APPEND | O_CREAT);
-	pid == fork();
+	int file_desc = open("/dev/tty", O_RDWR);
+	pid = fork();
 
 	if (pid == 0) {
 
-
-		close(0);
-		close(pd[1]);
-		dup2(file_desc, pd[0]);
+		dup2(file_desc, file_desc);
+		dup2(pd[0], 1);
+		close(pd[0]);
+		close(1);
 		char** path_arr;
 		char *path= getenv("PATH");
+		cout << "here";
 		int current_path = 0;
 
 		char temp_string;
@@ -51,6 +52,7 @@ int main(int argc, char* argv[]) {
 			}
 
 		}
+		cout << path_arr;
 
 		char* pathname;
 		for (int i = 0; i < current_path + 1; i++) {
@@ -91,31 +93,38 @@ int main(int argc, char* argv[]) {
 		}
 		bool failure = execv(tempName, commandv);
 		if (failure) {
-			cout << "Error" << endl;
+			printf("Error");
 		}
 		
-		/*execv(pathname[0], commandv);*/
-
-		/*_exit(0);*/
+		/*
+		
+		*/
+		
 
 	}
-	else {
+	while (pid != wait(0));
 		/**** PARENT *****/
-		while (pid != wait(0));
+	/*	*/
 		/*fflush(0);*/
+		dup2(pd[1],0);
+		close(pd[1]);
+		dup2(file_desc, file_desc);
+
+		cout << "here1";
 		close(0);
-		dup2(file_desc,0);
-		/*dup2(pd[1], 1);*/
-		dup2(file_desc, 1);
-		close(pd[0]);
+		/*dup2(file_desc, 0);
+		
+		dup2(pd[1], 1);*/
 		int counter = 1;
 		string response = "";
 		string line = "";
 		string test = "";
 		while (getline(cin, line)) {
+			response = "";
 			if (counter % displayLines != 0) {
 
 				cout << line << endl;
+				counter++;
 			}
 			else {
 				while (response != "Q" || response != "q" || response != "C" || response != "c") {
@@ -130,16 +139,14 @@ int main(int argc, char* argv[]) {
 
 				}
 			}
-			counter++;
 		}
-
 
 
 
 
 		_exit(0);
 
-	}
+	
 	
 	return 0;
 }
