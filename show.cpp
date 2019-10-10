@@ -9,8 +9,9 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <fstream> 
 #include <cstdio>
+#include <iomanip>
+#include <fstream>
 using namespace std;
 
 
@@ -33,85 +34,99 @@ int main(int argc, char* argv[]) {
 		dup2(pd[0], 1);
 		close(pd[0]);
 		close(1);
-		char** path_arr;
-		char *path= getenv("PATH");
-		cout << "here";
+		string path_arr = "";
+		string pathname;
+
+		string path = getenv("PATH");
 		int current_path = 0;
 
 		char temp_string;
 		int placeHolder = 0;
-
-		for (int i = 0; i < sizeof(path); i++) {
-
-			if (path[i] == ':') {
-				current_path++;
-				placeHolder = i;
-			}
-			else {
-				path_arr[current_path][(i - placeHolder - 1)] = path[i];
-			}
-
-		}
-		cout << path_arr;
-
-		char* pathname;
-		for (int i = 0; i < current_path + 1; i++) {
-			if (!access(path_arr[i], X_OK)) {
-				pathname = path_arr[i];
-				break;
-			}
-
-		}
-
 		int offset;
 		if (argv[1][0] == '-') {
 			offset = 2;
 			string displayLinesString = "";
 			if (isdigit(argv[1][1])) {
-				for (int i = 1; i < sizeof(argv[1]); i++) {
-
-					displayLines = stoi(displayLinesString);
-				}
+				char* tempArg = argv[1];
+				displayLinesString = &tempArg[1];
+				displayLines = stoi(displayLinesString);
 			}
 
 		}
 		else {
 			offset = 1;
 		}
+		cout << displayLines << endl;
+
 		commandv = &argv[offset];
-		char tempName[1024];
-		for (int j = 0; j < sizeof(pathname[0]) + 1; j++) {
-			if (j <= sizeof(pathname[0])) {
-				tempName[j] = pathname[j];
-			}
-			else {
-				for (int k = 0; k < sizeof(commandv[0]); k++) {
-					int L = j + k;
-					tempName[L] = commandv[0][k];
+		string  tempCommand;
+		tempCommand.append(commandv[0]);
+		int counter = 0;
+		int validPath = 0;
+		for (int i = 0; i < sizeof(path); i++) {
+			if (!validPath) {
+				if (path[i] == ':') {
+					char pathHolder[] = "";
+					int tempCount = 1;
+					for (int j = 0; j < sizeof(path_arr); j++) {
+						tempCount += 1;
+						pathHolder[j] = path_arr[j];
+					}
+					if (!access(pathHolder, X_OK)) {
+						validPath = 1;
+						pathname.append(pathHolder);
+
+						pathname += "/";
+						pathname += tempCommand;
+						break;
+
+					}
+					else {
+						path_arr = "";
+					}
+					counter = 0;
+				}
+				else {
+					path_arr[counter] = path[i];
+					counter++;
 				}
 			}
+
+
 		}
-		bool failure = execv(tempName, commandv);
+
+		char fullPath[] = "";
+		for (int i = 0; i < pathname.size(); i++) {
+			fullPath[i] = pathname[i];
+		}
+
+
+	/*	bool failure = execv(fullPath, argv);
 		if (failure) {
-			printf("Error");
-		}
-		
-		/*
-		
-		*/
+			cout << ("Error") << endl;
+			
+		}*/
+
+		execv(fullPath, commandv);
+		exit(errno);
 		
 
 	}
+	else {
+		/***
 	while (pid != wait(0));
-		/**** PARENT *****/
+		* PARENT *****/
 	/*	*/
-		/*fflush(0);*/
-		dup2(pd[1],0);
+		/*fflush(0);*///parent stuff
+    int status;
+    wait(&status);       /*you made a exit call in child you 
+                           need to wait on exit status of child*/
+    if(WIFEXITED(status))
+         cout << WEXITSTATUS(status) << endl;
+		dup2(pd[0],0);
 		close(pd[1]);
 		dup2(file_desc, file_desc);
 
-		cout << "here1";
-		close(0);
 		/*dup2(file_desc, 0);
 		
 		dup2(pd[1], 1);*/
@@ -119,7 +134,11 @@ int main(int argc, char* argv[]) {
 		string response = "";
 		string line = "";
 		string test = "";
-		while (getline(cin, line)) {
+		/*FILE* input = fdopen(pipe[0], "r");*/
+		ifstream inFile;
+		inFile.open("/dev/tty");
+		cout << "here" << endl;
+		while (inFile >> line) {
 			response = "";
 			if (counter % displayLines != 0) {
 
@@ -141,12 +160,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 
-
-
-
-		_exit(0);
-
-	
+	}
 	
 	return 0;
 }
